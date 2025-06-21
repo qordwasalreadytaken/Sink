@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "qordsink",
+  "name": "sink",
   "main": "dist/server/index.mjs",
   "assets": {
     "binding": "ASSETS",
@@ -18,7 +18,7 @@
   "analytics_engine_datasets": [
     {
       "binding": "ANALYTICS",
-      "dataset": "qordsink"
+      "dataset": "sink"
     }
   ],
   "kv_namespaces": [
