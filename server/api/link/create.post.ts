@@ -7,7 +7,6 @@ defineRouteMeta({
       required: true,
       content: {
         'application/json': {
-          // Need: https://github.com/nitrojs/nitro/issues/2974
           schema: {
             type: 'object',
             required: ['url'],
@@ -24,9 +23,23 @@ defineRouteMeta({
   },
 })
 
-export default eventHandler(async (event) => {
-  const link = await readValidatedBody(event, LinkSchema.parse)
+// ✅ CORS helper
+const addCors = (event: any) => {
+  setHeader(event, 'Access-Control-Allow-Origin', 'https://qordwasalreadytaken.github.io') // <-- your site
+  setHeader(event, 'Access-Control-Allow-Methods', 'POST, OPTIONS')
+  setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
+}
 
+export default eventHandler(async (event) => {
+  // ✅ Handle preflight
+  if (getMethod(event) === 'OPTIONS') {
+    addCors(event)
+    return '' // empty 204 response
+  }
+
+  addCors(event)
+
+  const link = await readValidatedBody(event, LinkSchema.parse)
   const { caseSensitive } = useRuntimeConfig(event)
 
   if (!caseSensitive) {
@@ -41,9 +54,7 @@ export default eventHandler(async (event) => {
       status: 409, // Conflict
       statusText: 'Link already exists',
     })
-  }
-
-  else {
+  } else {
     const expiration = getExpiration(event, link.expiration)
 
     await KV.put(`link:${link.slug}`, JSON.stringify(link), {
