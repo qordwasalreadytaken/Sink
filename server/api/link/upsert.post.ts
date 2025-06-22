@@ -1,6 +1,19 @@
 import { LinkSchema } from '@@/schemas/link'
 
+const addCors = (event: any) => {
+  setHeader(event, 'Access-Control-Allow-Origin', 'https://qordwasalreadytaken.github.io') // Replace with your GitHub Pages URL
+  setHeader(event, 'Access-Control-Allow-Methods', 'POST, OPTIONS')
+  setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
+}
+
 export default eventHandler(async (event) => {
+  if (getMethod(event) === 'OPTIONS') {
+    addCors(event)
+    return ''
+  }
+
+  addCors(event)
+
   const link = await readValidatedBody(event, LinkSchema.parse)
   const { caseSensitive } = useRuntimeConfig(event)
 
@@ -11,16 +24,13 @@ export default eventHandler(async (event) => {
   const { cloudflare } = event.context
   const { KV } = cloudflare.env
 
-  // Check if link exists
   const existingLink = await KV.get(`link:${link.slug}`, { type: 'json' })
 
   if (existingLink) {
-    // If link exists, return it along with the short link
     const shortLink = `${getRequestProtocol(event)}://${getRequestHost(event)}/${link.slug}`
     return { link: existingLink, shortLink, status: 'existing' }
   }
 
-  // If link doesn't exist, create it
   const expiration = getExpiration(event, link.expiration)
 
   await KV.put(`link:${link.slug}`, JSON.stringify(link), {
