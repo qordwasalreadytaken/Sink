@@ -1,4 +1,3 @@
-console.log('🔥 Handler reached:', getMethod(event))
 import { LinkSchema } from '@@/schemas/link'
 
 defineRouteMeta({
@@ -34,7 +33,6 @@ const addCors = (event: any) => {
 export default eventHandler(async (event) => {
   // ✅ Handle preflight
   if (getMethod(event) === 'OPTIONS') {
-    console.log('⚙️ Handling preflight OPTIONS request')
     addCors(event)
     return '' // empty 204 response
   }
@@ -50,9 +48,8 @@ export default eventHandler(async (event) => {
 
   const { cloudflare } = event.context
   const { KV } = cloudflare.env
-  const existingLink = await KV.get(`link:${link.slug}`)
+  const existingLink = await KV.get(link:${link.slug})
   if (existingLink) {
-    console.log('⚠️ Link already exists:', link.slug)    
     throw createError({
       status: 409, // Conflict
       statusText: 'Link already exists',
@@ -60,7 +57,7 @@ export default eventHandler(async (event) => {
   } else {
     const expiration = getExpiration(event, link.expiration)
 
-    await KV.put(`link:${link.slug}`, JSON.stringify(link), {
+    await KV.put(link:${link.slug}, JSON.stringify(link), {
       expiration,
       metadata: {
         expiration,
@@ -69,8 +66,7 @@ export default eventHandler(async (event) => {
       },
     })
     setResponseStatus(event, 201)
-    const shortLink = `${getRequestProtocol(event)}://${getRequestHost(event)}/${link.slug}`
+    const shortLink = ${getRequestProtocol(event)}://${getRequestHost(event)}/${link.slug}
     return { link, shortLink }
   }
 })
-console.log('✅ Link created successfully:', link.slug)
