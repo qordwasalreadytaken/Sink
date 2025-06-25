@@ -57,14 +57,9 @@ export default eventHandler(async (event) => {
   } else {
     const expiration = getExpiration(event, link.expiration)
 
-    await KV.put(`link:${link.slug}`, JSON.stringify(link), {
-      expiration,
-      metadata: {
-        expiration,
-        url: link.url,
-        comment: link.comment,
-      },
-    })
+    await KV.put(`link:${link.slug}`, JSON.stringify({ url: link.url }), {
+      expiration
+    });
     setResponseStatus(event, 201)
     const shortLink = `${getRequestProtocol(event)}://${getRequestHost(event)}/${link.slug}`
     return { link, shortLink }
