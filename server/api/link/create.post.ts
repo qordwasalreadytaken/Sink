@@ -23,12 +23,22 @@ defineRouteMeta({
   },
 })
 
-// ✅ CORS helper
+const allowedOrigins = [
+  'https://qordwasalreadytaken.github.io',
+  'https://build.pathofdiablo.com'
+]
+
 const addCors = (event: any) => {
-  setHeader(event, 'Access-Control-Allow-Origin', 'https://qordwasalreadytaken.github.io') // <-- your site
+  const origin = getHeader(event, 'origin')
+
+  if (origin && allowedOrigins.includes(origin)) {
+    setHeader(event, 'Access-Control-Allow-Origin', origin)
+  }
+
   setHeader(event, 'Access-Control-Allow-Methods', 'POST, OPTIONS')
   setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
 }
+
 
 export default eventHandler(async (event) => {
   // ✅ Handle preflight
