@@ -1,7 +1,18 @@
 import { LinkSchema } from '@@/schemas/link'
 
+
+const allowedOrigins = [
+  'https://qordwasalreadytaken.github.io',
+  'https://build.pathofdiablo.com'
+]
+
 const addCors = (event: any) => {
-  setHeader(event, 'Access-Control-Allow-Origin', 'https://qordwasalreadytaken.github.io') // Replace with your GitHub Pages URL
+  const origin = getHeader(event, 'origin')
+
+  if (origin && allowedOrigins.includes(origin)) {
+    setHeader(event, 'Access-Control-Allow-Origin', origin)
+  }
+
   setHeader(event, 'Access-Control-Allow-Methods', 'POST, OPTIONS')
   setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
 }

@@ -1,5 +1,14 @@
 export default defineEventHandler((event) => {
-  setHeader(event, 'Access-Control-Allow-Origin', 'https://qordwasalreadytaken.github.io')
+  const origin = getHeader(event, 'origin')
+  const allowedOrigins = [
+   'https://qordwasalreadytaken.github.io',
+   'https://build.pathofdiablo.com'
+  ]
+
+  if (origin && allowedOrigins.includes(origin)) {
+    setHeader(event, 'Access-Control-Allow-Origin', origin)
+  }
+
   setHeader(event, 'Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
 
@@ -9,3 +18,4 @@ export default defineEventHandler((event) => {
     event.node.res.end()
   }
 })
+
