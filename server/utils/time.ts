@@ -5,9 +5,9 @@ export function getExpiration(event: H3Event, expiration: number | undefined) {
   if (previewMode) {
     const { previewTTL } = useAppConfig(event)
     const previewExpiration = Math.floor(Date.now() / 1000) + previewTTL
-//    if (!expiration || expiration > previewExpiration)
+    if (!expiration || expiration > previewExpiration)
 //      expiration = Math.floor(Date.now() / 1000) + previewTTL
-    const expiration = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 // 7 days from now
+      expiration = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 // 7 days from now
 
   }
 

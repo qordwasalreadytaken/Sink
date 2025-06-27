@@ -65,8 +65,8 @@ export default eventHandler(async (event) => {
       statusText: 'Link already exists',
     })
   } else {
-//    const expiration = getExpiration(event, link.expiration)
-    const expiration = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 // 7 days from now
+    const expiration = getExpiration(event, link.expiration)
+//    const expiration = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 // 7 days from now
 
 
     await KV.put(`link:${link.slug}`, JSON.stringify({ url: link.url }), {
