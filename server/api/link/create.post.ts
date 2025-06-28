@@ -15,6 +15,9 @@ defineRouteMeta({
                 type: 'string',
                 description: 'The URL to shorten',
               },
+              expiration: {
+                type: 'number',
+              },
             },
           },
         },
