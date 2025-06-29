@@ -22,12 +22,12 @@ export default eventHandler(async (event) => {
 
   try {
     const result = await $fetch('https://sink.actuallyiamqord.workers.dev/api/link/create', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${siteToken}`,
-        'Content-Type': 'application/json',
-      },
-      body,
+    method: 'POST',
+    headers: {
+        'Authorization': 'Bearer TacoToken', // 👈 Hardcoded test
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
     });
 
     return result;
