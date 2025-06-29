@@ -2,7 +2,8 @@ export default defineEventHandler((event) => {
   const origin = getHeader(event, 'origin')
   const allowedOrigins = [
    'https://qordwasalreadytaken.github.io',
-   'https://build.pathofdiablo.com'
+   'https://build.pathofdiablo.com',
+   'https://sink.actuallyiamqord.workers.dev'
   ]
 
   if (origin && allowedOrigins.includes(origin)) {
