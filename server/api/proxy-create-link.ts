@@ -1,6 +1,6 @@
 // server/api/proxy-create-link.ts
 
-import { createShortLink } from '~/server/utils/createLink'
+//import { createShortLink } from '~/server/utils/createLink'
 
 export default eventHandler(async (event) => {
   const origin = getHeader(event, 'origin')

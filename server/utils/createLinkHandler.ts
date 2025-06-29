@@ -1,5 +1,5 @@
 // server/utils/createLinkHandler.ts
-import { getExpiration } from '~/utils/getExpiration';
+//import { getExpiration } from '~/utils/getExpiration';
 import { getRequestHost, getRequestProtocol, readValidatedBody, setResponseStatus } from 'h3';
 import { LinkSchema } from "@@/schemas/link";
 
