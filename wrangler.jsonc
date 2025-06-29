@@ -1,6 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "sink",
+  "vars": {
+    "SITE_TOKEN": "TacoToken"
+  },  
   "main": "dist/server/index.mjs",
   "assets": {
     "binding": "ASSETS",

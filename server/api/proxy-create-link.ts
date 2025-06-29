@@ -1,24 +1,15 @@
-// server/api/proxy-create-link.ts
-
-//import { createShortLink } from '~/server/utils/createLink'
-
 export default eventHandler(async (event) => {
-  const origin = getHeader(event, 'origin')
-  const allowedOrigins = [
-    'https://qordwasalreadytaken.github.io',
-    'https://build.pathofdiablo.com',
-  ]
+  const body = await readBody(event);
 
-  if (origin && allowedOrigins.includes(origin)) {
-    setHeader(event, 'Access-Control-Allow-Origin', origin)
-  }
-  setHeader(event, 'Access-Control-Allow-Methods', 'POST, OPTIONS')
-  setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type')
+  const response = await fetch('https://sink.actuallyiamqord.workers.dev/api/link/create', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer TacoToken', // ← your hardcoded token
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
 
-  if (getMethod(event) === 'OPTIONS') {
-    return new Response(null, { status: 204 })
-  }
-
-  // 🔁 Call same core logic
-  return await createShortLink(event)
-})
+  const data = await response.json();
+  return data;
+});
