@@ -39,7 +39,7 @@ export default eventHandler(async (event) => {
       body,
     });
 
-    return response;
+  return send(event, response);
   } catch (err: any) {
     console.error('Proxy error:', err?.message || err);
     return sendError(event, createError({ statusCode: 500, message: 'Proxy request failed' }));

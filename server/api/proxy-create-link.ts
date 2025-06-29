@@ -1,24 +1,24 @@
+// server/api/proxy-create-link.ts
+
+import { createShortLink } from '~/server/utils/createLink'
+
 export default eventHandler(async (event) => {
+  const origin = getHeader(event, 'origin')
+  const allowedOrigins = [
+    'https://qordwasalreadytaken.github.io',
+    'https://build.pathofdiablo.com',
+  ]
+
+  if (origin && allowedOrigins.includes(origin)) {
+    setHeader(event, 'Access-Control-Allow-Origin', origin)
+  }
+  setHeader(event, 'Access-Control-Allow-Methods', 'POST, OPTIONS')
+  setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type')
+
   if (getMethod(event) === 'OPTIONS') {
-    setHeader(event, 'Access-Control-Allow-Origin', 'https://qordwasalreadytaken.github.io');
-    setHeader(event, 'Access-Control-Allow-Methods', 'POST, OPTIONS');
-    setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type');
-    return '';
+    return new Response(null, { status: 204 })
   }
 
-  setHeader(event, 'Access-Control-Allow-Origin', 'https://qordwasalreadytaken.github.io');
-
-  const body = await readBody(event);
-
-  const response = await fetch('https://sink.actuallyiamqord.workers.dev/api/link/create', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${useRuntimeConfig().siteToken}`, // or hardcoded if needed
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-
-  const data = await response.json();
-  return data;
-});
+  // 🔁 Call same core logic
+  return await createShortLink(event)
+})
