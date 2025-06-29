@@ -1,30 +1,44 @@
 export default eventHandler(async (event) => {
-  const { url } = await readBody(event)
+  const allowedOrigins = [
+    'https://qordwasalreadytaken.github.io',
+    'https://build.pathofdiablo.com'
+  ];
 
-  if (!url || typeof url !== 'string') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Missing or invalid URL',
-    })
+  const origin = getHeader(event, 'origin');
+  const runtimeConfig = useRuntimeConfig(event);
+
+  // ✅ Add CORS headers
+  if (origin && allowedOrigins.includes(origin)) {
+    setHeader(event, 'Access-Control-Allow-Origin', origin);
+  }
+  setHeader(event, 'Access-Control-Allow-Methods', 'POST, OPTIONS');
+  setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type');
+
+  // ✅ Handle preflight
+  if (getMethod(event) === 'OPTIONS') {
+    return new Response(null, { status: 204 });
   }
 
-  const response = await fetch('https://sink.actuallyiamqord.workers.dev/api/link/create', {
+  // ✅ Parse body
+  let body;
+  try {
+    body = await readBody(event);
+  } catch (err) {
+    return sendError(event, createError({ statusCode: 400, message: 'Invalid JSON' }));
+  }
+
+  // ✅ Forward to internal secure API with Authorization
+  const response = await $fetch(`${runtimeConfig.public.siteUrl}/api/link/create`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${process.env.SHORTLINK_API_TOKEN ?? 'TacoToken'}`,
+      Authorization: `Bearer ${runtimeConfig.siteToken}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ url }),
-  })
+    body,
+  }).catch((err) => {
+    console.error('Proxy error:', err);
+    return sendError(event, createError({ statusCode: 500, message: 'Upstream failure' }));
+  });
 
-  const json = await response.json()
-
-  if (!response.ok) {
-    throw createError({
-      statusCode: response.status,
-      statusMessage: json.message || 'Error from shortlink API',
-    })
-  }
-
-  return json
-})
+  return response;
+});
