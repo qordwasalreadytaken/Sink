@@ -20,7 +20,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    siteToken: process.env.SITE_TOKEN || 'TacoToken',
+    siteToken: 'TacoToken',
     redirectStatusCode: '301',
     linkCacheTtl: 60,
     redirectWithQuery: false,
