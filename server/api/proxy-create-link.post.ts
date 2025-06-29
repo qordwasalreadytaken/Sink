@@ -5,6 +5,8 @@ export default eventHandler(async (event) => {
   ];
   const origin = getHeader(event, 'origin');
   const runtimeConfig = useRuntimeConfig(event);
+  const BASE_URL = 'https://sink.actuallyiamqord.workers.dev';
+
 
   // ✅ CORS headers
   if (origin && allowedOrigins.includes(origin)) {
@@ -28,7 +30,7 @@ export default eventHandler(async (event) => {
 
   // ✅ Forward request to secured /api/link/create
   try {
-    const response = await $fetch(`${runtimeConfig.public.siteUrl}/api/link/create`, {
+    const response = await $fetch(`${BASE_URL}/api/link/create`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${runtimeConfig.siteToken}`,
