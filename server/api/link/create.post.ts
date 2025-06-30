@@ -1,4 +1,5 @@
-import { LinkSchema } from '@@/schemas/link'
+import { LinkSchema } from '@@/schemas/link';
+import { createShortLink } from '~/server/utils/createLink';
 
 defineRouteMeta({
   openAPI: {
@@ -24,59 +25,42 @@ defineRouteMeta({
       },
     },
   },
-})
+});
 
 const allowedOrigins = [
   'https://qordwasalreadytaken.github.io',
-  'https://build.pathofdiablo.com'
-]
+  'https://build.pathofdiablo.com',
+];
 
 const addCors = (event: any) => {
-  const origin = getHeader(event, 'origin')
+  const origin = getHeader(event, 'origin');
 
   if (origin && allowedOrigins.includes(origin)) {
-    setHeader(event, 'Access-Control-Allow-Origin', origin)
+    setHeader(event, 'Access-Control-Allow-Origin', origin);
   }
 
-  setHeader(event, 'Access-Control-Allow-Methods', 'POST, OPTIONS')
-  setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization')
-}
-
+  setHeader(event, 'Access-Control-Allow-Methods', 'POST, OPTIONS');
+  setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization');
+};
 
 export default eventHandler(async (event) => {
   // ✅ Handle preflight
   if (getMethod(event) === 'OPTIONS') {
-    addCors(event)
-    return '' // empty 204 response
+    addCors(event);
+    return '';
   }
 
-  addCors(event)
+  addCors(event);
 
-  const link = await readValidatedBody(event, LinkSchema.parse)
-  const { caseSensitive } = useRuntimeConfig(event)
+  const link = await readValidatedBody(event, LinkSchema.parse);
+  const { caseSensitive } = useRuntimeConfig(event);
 
   if (!caseSensitive) {
-    link.slug = link.slug.toLowerCase()
+    link.slug = link.slug.toLowerCase();
   }
 
-  const { cloudflare } = event.context
-  const { KV } = cloudflare.env
-  const existingLink = await KV.get(`link:${link.slug}`)
-  if (existingLink) {
-    throw createError({
-      status: 409, // Conflict
-      statusText: 'Link already exists',
-    })
-  } else {
-    const expiration = getExpiration(event, link.expiration)
-//    const expiration = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 // 7 days from now
+  const { cloudflare } = event.context;
+  const { KV } = cloudflare.env;
 
-
-    await KV.put(`link:${link.slug}`, JSON.stringify({ url: link.url }), {
-      expiration
-    });
-    setResponseStatus(event, 201)
-    const shortLink = `${getRequestProtocol(event)}://${getRequestHost(event)}/${link.slug}`
-    return { link, shortLink }
-  }
-})
+  return await createShortLink(event, KV, link);
+});
